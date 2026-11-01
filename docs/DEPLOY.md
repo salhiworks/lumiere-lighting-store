@@ -47,6 +47,10 @@ That makes it safe to host next to, or instead of, a real store.
 
 For checkout, also point a Stripe webhook at `https://your-domain/api/webhooks/stripe` ([CHECKOUT.md](CHECKOUT.md)).
 
+## Vercel (public demo)
+
+The live demo runs on Vercel. Import the repository, keep the Next.js preset, and set the build command to `npm run build:demo` (Vercel serves Next.js itself, so no start command is needed). Set `NEXT_PUBLIC_SITE_URL` to the demo's address. Don't deploy a Supabase-connected store this way without reading the rest of this guide: it is written for a single Node.js server.
+
 ## Good to know
 
 - **Photos.** The original lamp photos are fetched from their source on first request and served from your own domain. Put files with the same names in `public/lamps/` to serve them yourself. Check their rights first: see [ASSETS.md](ASSETS.md).

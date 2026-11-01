@@ -2,6 +2,8 @@
 
 A premium storefront for a small pendant-lighting studio, built with Next.js around the 21st.dev **Pendant Lamp Rail**. Visitors brush along a brass track to switch the pendants on, drag them, and lift one into a detail view with a dimmer, then add it to the cart.
 
+**Live demo: [lumiere-lighting-store.vercel.app](https://lumiere-lighting-store.vercel.app)**
+
 ![The LUMIÈRE homepage: eight pendants hanging from a brushed rail, one of them lit](docs/images/storefront-rail.jpg)
 
 | Lamp detail with dimmer | On a phone |
