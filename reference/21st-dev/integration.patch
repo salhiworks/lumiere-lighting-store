@@ -1,0 +1,115 @@
+--- a/components/ui/pendant-lamp-rail.tsx (21st.dev original)
++++ b/components/ui/pendant-lamp-rail.tsx (LUMIÈRE)
+@@ -28,6 +28,13 @@
+   open: string;
+ }
+ 
++export interface PendantLampDetailContext {
++  /** Position of the open lamp in `items`. */
++  index: number;
++  /** Closes the detail with its lift-back animation, exactly like the close button. */
++  close: () => void;
++}
++
+ export interface PendantLampRailProps extends React.ComponentProps<"section"> {
+   items: PendantLamp[];
+   eyebrow?: string;
+@@ -45,6 +52,8 @@
+   onActiveChange?: (index: number | null) => void;
+   onOpenChange?: (index: number | null) => void;
+   labels?: PendantLampRailLabels;
++  /** Call to action rendered in the detail view under the tag, such as store actions. Its links and buttons join the focus trap. */
++  detailAction?: (item: PendantLamp, detail: PendantLampDetailContext) => React.ReactNode;
+ }
+ 
+ const ASPECT = 2 / 3;
+@@ -75,6 +84,8 @@
+ const RAD = Math.PI / 180;
+ const DEG = 180 / Math.PI;
+ const DEFAULT_LABELS: PendantLampRailLabels = { close: "Close", dimmer: "Dimmer", open: "Lift to dim" };
++/* Controls the detail's focus trap cycles through. Links are included so a `detailAction` link can be reached with Tab. */
++const FOCUSABLE = "a[href], button, input";
+ 
+ /* Light, blend and shadow strengths per theme. Chart 4 is warm in the light palette and chart 3 in the dark one. */
+ const THEME =
+@@ -231,6 +242,7 @@
+   onActiveChange,
+   onOpenChange,
+   labels = DEFAULT_LABELS,
++  detailAction,
+   className,
+   onPointerLeave,
+   ...rest
+@@ -426,6 +438,15 @@
+ 
+   React.useEffect(() => () => { cancelAnimationFrame(sim.current.raf); sim.current.raf = 0; }, []);
+ 
++  /* Next.js (Cache Components) hides a route with React <Activity> instead of unmounting it, and runs effect cleanups when it does.
++     Close the detail then, so coming back to the page shows the rail rather than a detail that replays its opening flight. */
++  React.useLayoutEffect(() => () => {
++    if (live.current.openIndex === null) return;
++    live.current.openIndex = null;
++    setOpenIndex(null);
++    live.current.onOpenChange?.(null);
++  }, []);
++
+   React.useLayoutEffect(() => {
+     if (openIndex !== null || lifted !== null || returnFocus.current === null) return;
+     const index = returnFocus.current;
+@@ -808,6 +829,7 @@
+           source={sourceRect}
+           onLift={onLift}
+           onClose={closeDetail}
++          renderAction={detailAction}
+         />
+       )}
+     </section>
+@@ -882,9 +904,10 @@
+   source: () => DOMRect | null;
+   onLift: (lifted: boolean) => void;
+   onClose: () => void;
++  renderAction?: PendantLampRailProps["detailAction"];
+ };
+ 
+-function Detail({ uid, item, index, total, labels, reduced, dim, failed, onFail, onDim, source, onLift, onClose }: DetailProps) {
++function Detail({ uid, item, index, total, labels, reduced, dim, failed, onFail, onDim, source, onLift, onClose, renderAction }: DetailProps) {
+   const dialogRef = React.useRef(null as HTMLDivElement | null);
+   const figureRef = React.useRef(null as HTMLDivElement | null);
+   const swayRef = React.useRef(null as HTMLDivElement | null);
+@@ -951,7 +974,7 @@
+       const dialog = dialogRef.current;
+       if (!dialog || dialog.contains(event.target as Node)) return;
+       if (event.key === "Escape") { event.preventDefault(); dismiss(); }
+-      else if (event.key === "Tab") { const first = dialog.querySelector("button, input"); if (first instanceof HTMLElement) { event.preventDefault(); first.focus(); } }
++      else if (event.key === "Tab") { const first = dialog.querySelector(FOCUSABLE); if (first instanceof HTMLElement) { event.preventDefault(); first.focus(); } }
+     };
+     document.addEventListener("keydown", onKey);
+     return () => document.removeEventListener("keydown", onKey);
+@@ -960,7 +983,7 @@
+   const onKeyDown = (event: React.KeyboardEvent) => {
+     if (event.key === "Escape") { event.preventDefault(); dismiss(); return; }
+     if (event.key !== "Tab") return;
+-    const controls = [...(dialogRef.current?.querySelectorAll("button, input") ?? [])].filter((node): node is HTMLElement => node instanceof HTMLElement && !(node as HTMLButtonElement).disabled);
++    const controls = [...(dialogRef.current?.querySelectorAll(FOCUSABLE) ?? [])].filter((node): node is HTMLElement => node instanceof HTMLElement && !(node as HTMLButtonElement).disabled);
+     const first = controls[0];
+     const last = controls.at(-1);
+     if (!first || !last) return;
+@@ -1033,6 +1056,7 @@
+               </span>
+             </p>
+           )}
++          {renderAction && <div data-detail-action><DetailAction render={renderAction} item={item} index={index} close={dismiss} /></div>}
+         </div>
+       </div>
+     </div>,
+@@ -1040,5 +1064,10 @@
+   );
+ }
+ 
++/* Renders `detailAction` as its own component, so `close` arrives as a prop that the action calls from its event handlers. */
++function DetailAction({ render, item, index, close }: { render: NonNullable<PendantLampRailProps["detailAction"]>; item: PendantLamp; index: number; close: () => void }) {
++  return render(item, { index, close });
++}
++
+ export default PendantLampRail;
+ 

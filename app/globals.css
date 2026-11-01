@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* The two state variants the shadcn Sheet uses (from shadcn/tailwind.css; the rest of that file is not needed here). */
+@custom-variant data-open {
+  &:where([data-state="open"]),
+  &:where([data-open]:not([data-open="false"])) {
+    @slot;
+  }
+}
+
+@custom-variant data-closed {
+  &:where([data-state="closed"]),
+  &:where([data-closed]:not([data-closed="false"])) {
+    @slot;
+  }
+}
+
+/* The Pendant Lamp Rail ships `dark:` variants. LUMIÈRE is a light-only storefront, so `dark:` is bound to a `.dark` class the site never
+   sets. With Tailwind's default (prefers-color-scheme) the rail would switch to its dark blend and shadow settings on an ivory page. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-brass: var(--brass);
+  --color-brass-deep: var(--brass-deep);
+
+  --font-sans: var(--font-albert-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-heading: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* LUMIÈRE palette: Porcelain, Paper, Linen, Graphite, Ash, Hairline, Brass. */
+:root {
+  --background: oklch(0.98 0.006 84.6); /* Porcelain #FAF8F4 */
+  --foreground: oklch(0.245 0.009 75.2); /* Graphite #23201C */
+  --card: oklch(0.994 0.006 84.6); /* Paper #FFFDF9 */
+  --card-foreground: oklch(0.245 0.009 75.2);
+  --popover: oklch(0.994 0.006 84.6);
+  --popover-foreground: oklch(0.245 0.009 75.2);
+  --primary: oklch(0.245 0.009 75.2);
+  --primary-foreground: oklch(0.98 0.006 84.6);
+  --secondary: oklch(0.945 0.013 82.4); /* Linen #F1ECE3 */
+  --secondary-foreground: oklch(0.245 0.009 75.2);
+  --muted: oklch(0.945 0.013 82.4);
+  --muted-foreground: oklch(0.502 0.016 78.2); /* Ash #69635A, 5.6:1 on Porcelain */
+  --accent: oklch(0.927 0.016 82.8);
+  --accent-foreground: oklch(0.245 0.009 75.2);
+  --destructive: oklch(0.509 0.138 31.7);
+  --border: oklch(0.897 0.018 81.3); /* Hairline #E3DCD0 */
+  --input: oklch(0.854 0.021 81.8);
+  --ring: oklch(0.509 0.071 76.4); /* Brass deep #7D6034, 5.5:1 on Porcelain */
+  --brass: oklch(0.64 0.084 78.4); /* Brass #A8864F, decorative only */
+  --brass-deep: oklch(0.509 0.071 76.4);
+
+  /* The rail reads its light from the chart tokens: chart-1 is the lamp accent (dots, dimmer) and chart-4 the warm glow of the light
+     palette (chart-3 is the dark-palette glow, unused here). 3 and 4 keep the classic shadcn chart values the component was tuned with;
+     current shadcn presets ship grey charts, which would turn every beam and pool grey. */
+  --chart-1: oklch(0.64 0.084 78.4);
+  --chart-2: oklch(0.502 0.016 78.2);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.645 0.246 16.439);
+  /* The rail's light-palette glow, shared by product cards and the product page. */
+  --glow: color-mix(in oklab, var(--chart-4) 68%, white);
+
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--brass) 30%, transparent);
+  }
+}
+
+/* Small uppercase label, the same treatment as the rail's own eyebrow. */
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+/* Centred page column with fluid gutters. */
+@utility shell {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* The ceiling rose a pendant's cord hangs from: the rail's brushed-metal gradient in miniature. */
+@utility ceiling-canopy {
+  width: 1.75rem;
+  height: 5px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--muted-foreground) 55%, white),
+    var(--muted-foreground) 55%,
+    color-mix(in oklab, var(--muted-foreground) 60%, black)
+  );
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+/* Warm light under a switched-on shade, mixed like the rail's pools. */
+@utility light-pool {
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--glow) 72%, transparent),
+    color-mix(in oklab, var(--glow) 28%, transparent) 50%,
+    transparent
+  );
+}
+
+/* Brand type inside the rail's detail view, styled through its public data-slot hook rather than by editing the component. */
+[data-slot="pendant-lamp-detail"] h3 {
+  font-family: var(--font-newsreader), ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
