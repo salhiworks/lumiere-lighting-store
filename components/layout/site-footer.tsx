@@ -61,18 +61,6 @@ export function SiteFooter({ collections, demoCatalog }: { collections: Collecti
               demoCatalog && <span className="block sm:inline"> Demo catalog: connect Supabase to manage products.</span>
             )}
           </p>
-          <p>
-            Interactive rail:{" "}
-            <a
-              href="https://21st.dev/@dhxwhy/components/pendant-lamp-rail"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-sm underline decoration-foreground/25 underline-offset-4 outline-none hover:text-foreground hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Pendant Lamp Rail by dhxwhy
-            </a>{" "}
-            (MIT)
-          </p>
         </div>
       </div>
     </footer>
