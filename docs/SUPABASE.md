@@ -10,11 +10,14 @@ Two migrations, run in order. Both are idempotent, so re-running them repairs a 
 
 `supabase/seed.sql` adds the three collections and the eight original pendants, with their original IDs and prices. It skips rows that already exist.
 
-Two ways to run them:
+Two ways to run them. Use one per project:
 - **SQL Editor:** paste each file and run it, migration first.
-- **Supabase CLI**, from the project folder:
-  1. `supabase db push --linked --project-ref <ref>` applies the migrations and records them in the project's migration history.
-  2. `supabase db query --linked --project-ref <ref> --file supabase/seed.sql` adds the products.
+- **Supabase CLI**, from the project folder. The CLI is pinned in `package.json` (2.122.0), so run `npm install` first and always call it as `npx supabase`. A hosted project needs no Docker:
+  1. `npx supabase login` opens your browser once.
+  2. `npx supabase link --project-ref <ref>` links this folder to your project.
+  3. `npx supabase migration list` shows the project's migration history. A new project has none. If it lists versions that aren't in `supabase/migrations`, stop: check the actual schema before you change anything, and never run `supabase db reset` on a hosted project.
+  4. `npx supabase db push --dry-run` shows what would be applied. `npx supabase db push` applies the migrations and records them in the project's migration history.
+  5. `npx supabase db query --linked --file supabase/seed.sql` adds the products.
 
 | Table | Holds | Read through the API | Written through the API |
 | --- | --- | --- | --- |

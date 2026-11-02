@@ -58,7 +58,7 @@ npm run start:demo   # http://localhost:3000 (uses PORT if set)
    - `migrations/20261101150000_orders_checkout.sql`
    - `seed.sql`
 
-   Each is safe to run again.
+   Each is safe to run again. Prefer the command line? [docs/SUPABASE.md](docs/SUPABASE.md) has the same steps with the project's pinned Supabase CLI.
 3. Click **Connect** in the dashboard and copy the project URL and the **publishable** key.
 4. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Then restart `npm run dev`.
 5. Create your administrator:
