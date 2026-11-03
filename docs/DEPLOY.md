@@ -24,6 +24,7 @@ LUMIÈRE is a standard Next.js server: it needs a Node.js host, not static hosti
 The demo build is locked when it is built:
 - It ignores any Supabase or Stripe settings, even if they are present on the server.
 - `/admin`, `/checkout` and the payment webhook are 404.
+- `/demo/admin` is the only dashboard: a demo with sample data, kept in each visitor's own browser (see [ARCHITECTURE.md](ARCHITECTURE.md#the-demo-admin-dashboard)).
 - It never contacts Supabase or Stripe.
 
 That makes it safe to host next to, or instead of, a real store.

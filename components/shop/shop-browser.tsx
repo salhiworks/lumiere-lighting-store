@@ -6,6 +6,7 @@ import { cn } from "cn";
 import { ProductGrid } from "@/components/product/product-grid";
 import { isSortValue, SORT_OPTIONS, sortProducts, type SortValue } from "@/lib/catalog/helpers";
 import type { Collection, Product } from "@/lib/catalog/types";
+import { useDemoProducts } from "@/lib/demo-admin/use-demo-catalog";
 
 type ShopBrowserProps = { products: Product[]; collections: Collection[] };
 
@@ -13,7 +14,10 @@ type ShopBrowserProps = { products: Product[]; collections: Collection[] };
  * Filter and sort live in the URL (/shop?collection=glass&sort=price-asc), so every view can be shared and reloaded. Changes go
  * through history.replaceState, which Next.js syncs with useSearchParams: the grid updates instantly, without a server round trip.
  */
-export function ShopBrowser({ products, collections }: ShopBrowserProps) {
+export function ShopBrowser({ products: catalog, collections: allCollections }: ShopBrowserProps) {
+  // In the public demo the visitor's Demo Admin edits are applied here; everywhere else both lists pass through unchanged.
+  const products = useDemoProducts(catalog);
+  const collections = allCollections.filter((item) => products.some((product) => product.collection === item.id));
   const searchParams = useSearchParams();
   const collectionParam = searchParams.get("collection");
   const sortParam = searchParams.get("sort");

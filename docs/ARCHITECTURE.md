@@ -11,6 +11,7 @@
 | Cart drawer | Opens from the header, the product page and the lamp detail. Quantities, remove, subtotal and Checkout (or why it isn't open). A product that was hidden or sold out after it was added is marked as such and left out of the subtotal. |
 | `/checkout/complete`, `/checkout/canceled` | Where Stripe sends customers back: the order's status as Stripe reports it, its items and totals, and tracking once shipped. Private links, `noindex`. |
 | `/admin`, `/admin/orders` | Sign-in, products (list, add, edit) and orders ([ADMIN.md](ADMIN.md)) |
+| `/demo/admin` | Public demo build only: the Demo Admin Dashboard (products, photo pairs, fictional orders). A 404 in every other build. |
 
 The shop grid shows a skeleton while it loads, and the cart has an empty state. Unknown URLs get the store's 404 page, and unexpected errors get an error page.
 
@@ -59,6 +60,17 @@ docs/                        setup, admin, checkout, deployment, photos, archite
 - Pages are prerendered. Request-dependent parts, such as the shop's filters and the admin, render for each request.
 - `proxy.ts` checks product URLs before a page starts streaming, so a missing product gets a real 404 status, not a 200 with a not-found message.
 - Next keeps recently visited routes mounted but hidden (React `<Activity>`). So the rail closes its detail view when hidden, the cart drawer closes on Back/Forward, and the new-product form starts empty on every visit.
+
+## The Demo Admin Dashboard
+
+The public demo (`npm run build:demo`) has an interactive stand-in for the admin at `/demo/admin`, reached from **View Demo Dashboard** in the header (a strip under the header on phones).
+
+- **No backend.** It uses no Supabase, Stripe, sign-in, real orders or customer data. The six orders are invented (`lib/demo-admin/orders.ts`).
+- **Browser-local.** `lib/demo-admin/store.ts` keeps only what the visitor changed (a partial product per ID, order shipping states) under `lumiere.demo-admin.v1` in localStorage. It is validated when read, so edited storage can't break a page. **Reset Demo** deletes the key; the cart is left alone.
+- **The storefront follows.** The server still renders the built-in catalog. In the demo build, `useDemoProducts()` (`lib/demo-admin/use-demo-catalog.ts`) layers the edits on top after hydration for the rail, shop, collections, product pages and the cart. Hidden products leave all of them, and a hidden product's page shows the store's not-found view. In any other build the hook returns its input and never reads storage.
+- **Same look, shared components.** The dashboard reuses the real admin's `ProductList`, `OrderTable`, `AdminNav`, form controls, `PhotoPairField` and the product form's validation (`lib/admin/product-input.ts`). The real admin's behavior is unchanged: `ProductTable` is now a thin wrapper around `ProductList`, and `AdminNav` and `OrderTable` take optional links.
+- **Photos.** A picked off/on pair is checked and previewed by the real `PhotoPairField`, then both photos are scaled and re-encoded the same way into small WebP data URLs (`lib/demo-admin/photos.ts`). Nothing is uploaded.
+- **Isolation.** The demo code imports nothing from `app/admin/`, `lib/supabase/` or `lib/admin/auth.ts`. `proxy.ts` answers `/demo/...` with a 404 unless the build is the public demo (and unknown demo IDs always), `app/demo/admin/layout.tsx` repeats that check, and `/admin`, `/checkout` and the webhook stay as locked as before. The production admin's sign-in, administrator checks and Row Level Security are untouched.
 
 ## The Pendant Lamp Rail: what was kept, what changed
 

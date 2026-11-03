@@ -4,16 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
 
-const LINKS = [
+export type AdminNavLink = { href: string; label: string; active: (path: string) => boolean };
+
+const LINKS: AdminNavLink[] = [
   { href: "/admin", label: "Products", active: (path: string) => path === "/admin" || path.startsWith("/admin/products") },
   { href: "/admin/orders", label: "Orders", active: (path: string) => path.startsWith("/admin/orders") },
 ];
 
-export function AdminNav() {
+/* The real admin's two links by default; the public Demo Admin Dashboard passes its own. */
+export function AdminNav({ links = LINKS }: { links?: AdminNavLink[] }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Admin" className="flex items-center gap-1">
-      {LINKS.map((link) => {
+      {links.map((link) => {
         const active = link.active(pathname);
         return (
           <Link

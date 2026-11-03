@@ -2,12 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isPublishedSlug, MISSING_PRODUCT_PATH } from "@/lib/catalog/published-slugs";
 import { orderTokenExists } from "@/lib/checkout/status-link";
+import { demoProductIds } from "@/lib/demo-admin/catalog";
+import { demoOrders } from "@/lib/demo-admin/orders";
 import { PUBLIC_DEMO } from "@/lib/public-demo";
 import { getSupabaseConfig, SESSION_COOKIE_OPTIONS, type SupabaseConfig } from "@/lib/supabase/config";
 import type { Database } from "@/lib/supabase/database.types";
 
 /*
- * Runs before three kinds of request, and nothing else (in the public demo build, everything but /shop/<slug> is a 404):
+ * Runs before three kinds of request, and nothing else (in the public demo build, everything but /shop/<slug> and the /demo/admin
+ * dashboard is a 404; in every other build /demo/... is a 404, so the demo dashboard doesn't exist outside the public demo):
  *   /shop/<slug>  checks the product exists and is published. If not, it serves the store's not-found page with a real HTTP 404,
  *                 for visitors and search engines alike (a product page that has started streaming could only send a 200).
  *   /admin/...    refreshes the Supabase session cookies, and sends anyone who isn't a signed-in administrator (signed out, not an
@@ -19,10 +22,21 @@ import type { Database } from "@/lib/supabase/database.types";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // The public demo has no admin and takes no orders: those addresses don't exist there.
+  if (pathname === "/demo" || pathname.startsWith("/demo/")) return PUBLIC_DEMO && isDemoDashboard(pathname) ? NextResponse.next() : missing(request);
   if (PUBLIC_DEMO && !pathname.startsWith("/shop/")) return missing(request);
   if (pathname.startsWith("/shop/")) return productProxy(request, pathname.slice("/shop/".length));
   if (pathname.startsWith("/checkout/")) return checkoutProxy(request);
   return adminProxy(request, pathname);
+}
+
+/* The Demo Admin Dashboard: /demo/admin and the pages under it, which hold only built-in sample data and the visitor's own browser edits. */
+function isDemoDashboard(pathname: string) {
+  const [, , , section, id, extra] = pathname.split("/");
+  if (pathname === "/demo/admin" || pathname === "/demo/admin/") return true;
+  if (extra !== undefined) return false;
+  if (section === "orders") return id === undefined || id === "" || demoOrders.some((order) => order.id === id);
+  if (section === "products") return id !== undefined && demoProductIds.includes(id);
+  return false;
 }
 
 /* The store's not-found page with a real 404 status, decided before anything renders. */
@@ -95,5 +109,5 @@ function noStore(response: NextResponse) {
 }
 
 export const config = {
-  matcher: ["/shop/:slug", "/admin", "/admin/:path*", "/checkout/:path*"],
+  matcher: ["/shop/:slug", "/admin", "/admin/:path*", "/checkout/:path*", "/demo", "/demo/:path*"],
 };

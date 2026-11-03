@@ -21,7 +21,8 @@ const FILTERS = [
 /* Fixed time zone, so the server render and the browser agree on every date. */
 const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
 
-export function OrderTable({ orders }: { orders: OrderSummary[] }) {
+/** `orderHref` lets the public Demo Admin Dashboard point rows at its own pages; the real admin uses the default. */
+export function OrderTable({ orders, orderHref = (order) => `/admin/orders/${order.id}` }: { orders: OrderSummary[]; orderHref?: (order: OrderSummary) => string }) {
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]["id"]>("all");
   const [query, setQuery] = React.useState("");
   const needle = query.trim().toLowerCase();
@@ -89,7 +90,7 @@ export function OrderTable({ orders }: { orders: OrderSummary[] }) {
           {visible.map((order) => (
             <li key={order.id} className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 border-b border-border py-4 md:grid-cols-[7rem_minmax(0,1.6fr)_8rem_10rem_6rem_6.5rem]">
               <Link
-                href={`/admin/orders/${order.id}`}
+                href={orderHref(order)}
                 aria-label={`Order ${order.number}`}
                 className="font-mono text-[13.5px] font-medium underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-ring"
               >

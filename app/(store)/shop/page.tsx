@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { ShopIntro } from "@/components/demo-admin/demo-shop-intro";
 import { ProductGridSkeleton } from "@/components/shop/product-grid-skeleton";
 import { ShopBrowser } from "@/components/shop/shop-browser";
 import { getCollectionsWithProducts, getProducts } from "@/lib/catalog";
 import { catalogFacts } from "@/lib/catalog/helpers";
 import { countWord } from "@/lib/format";
+import { PUBLIC_DEMO } from "@/lib/public-demo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { fromPrice } = catalogFacts(await getProducts());
@@ -25,10 +27,14 @@ export default async function ShopPage() {
           <p className="eyebrow">Shop</p>
           <h1 className="mt-3 font-display text-[clamp(2.4rem,4.6vw,3.6rem)] font-light leading-none tracking-[-0.025em]">All pendants</h1>
         </div>
-        <p className="max-w-[44ch] text-sm leading-relaxed text-muted-foreground">
-          {countWord(products.length)} designs in {collections.length} collections. Each pendant ships with its LED lamp and a 1.5 m fabric
-          cord.
-        </p>
+        {PUBLIC_DEMO ? (
+          <ShopIntro products={products} collectionIds={collections.map((entry) => entry.collection.id)} />
+        ) : (
+          <p className="max-w-[44ch] text-sm leading-relaxed text-muted-foreground">
+            {countWord(products.length)} designs in {collections.length} collections. Each pendant ships with its LED lamp and a 1.5 m fabric
+            cord.
+          </p>
+        )}
       </header>
       {/* The header above and this skeleton are prerendered; the grid depends on the URL, so it streams in per request. */}
       <Suspense fallback={<ProductGridSkeleton />}>

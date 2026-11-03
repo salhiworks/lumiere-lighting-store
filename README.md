@@ -31,8 +31,9 @@ You get the full storefront with eight demo pendants. Nothing is saved anywhere 
 ## Run the public demo
 
 The public demo is a locked build for showing the store to anyone:
-- It has no admin and no checkout.
+- It has no real admin and no checkout. The real `/admin` is a 404.
 - It never connects to Supabase or Stripe, even if their settings are present.
+- **View Demo Dashboard** (in the header) opens `/demo/admin`, an interactive look at the admin. Visitors can edit the sample pendants (name, price, stock, visibility, paired off/on photos) and fictional orders, and the storefront follows. Edits stay in the visitor's own browser; **Reset Demo** clears them. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#the-demo-admin-dashboard).
 
 ```bash
 npm run build:demo
