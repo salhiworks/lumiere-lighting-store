@@ -3,15 +3,18 @@ import { ArrowRight } from "lucide-react";
 import { LampImage } from "@/components/product/lamp-image";
 import type { Collection, Product } from "@/lib/catalog/types";
 
-/* Three showroom bays, one per collection. Each bay's pendants hang from the shared ceiling rule and switch on together on hover. */
+/*
+ * The showroom bays, one per collection. Each bay has its own length of track; its pendants hang from it and switch on together on
+ * hover or keyboard focus, and the bay's wall warms with them, so the difference between a focused pool and a room-filling glow shows.
+ */
 export function CollectionTiles({ entries }: { entries: { collection: Collection; products: Product[] }[] }) {
   return (
     <section aria-labelledby="collections-title" className="shell py-20 sm:py-28">
-      <div className="flex flex-wrap items-end justify-between gap-6">
+      <div className="settle flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="eyebrow">Shop by light</p>
-          <h2 id="collections-title" className="mt-3 font-display text-[clamp(2rem,3.4vw,2.85rem)] font-light leading-[1.05] tracking-[-0.02em]">
-            Three ways to light a room
+          <p className="eyebrow">The showroom</p>
+          <h2 id="collections-title" className="mt-3 font-display text-[clamp(2rem,3.6vw,3rem)] font-light leading-[1.05] tracking-[-0.025em]">
+            {entries.length === 3 ? "Three ways to light a room" : "Shop by the light they give"}
           </h2>
         </div>
         <Link
@@ -23,34 +26,43 @@ export function CollectionTiles({ entries }: { entries: { collection: Collection
         </Link>
       </div>
 
-      <ul className="mt-12 grid border-t border-foreground/15 md:grid-cols-3">
-        {entries.map(({ collection, products: lamps }) => {
-          return (
-            <li key={collection.id} className="border-b border-border md:border-b-0 md:border-l md:first:border-l-0">
-              <Link
-                href={`/shop?collection=${collection.id}`}
-                className="group flex h-full flex-col px-1 pb-8 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset md:px-8"
-              >
-                {/* Every bay hangs its lamps at the same scale: 23% of the bay each, in a box as tall as the lamps (photos end at ~78%). */}
-                <span aria-hidden="true" className="relative flex aspect-[8/3] justify-center gap-[2.5%] overflow-hidden">
-                  {lamps.map((product) => (
-                    <span key={product.id} className="relative block w-[23%]">
-                      <span className="ceiling-canopy absolute left-1/2 top-0 z-10 w-5 -translate-x-1/2" />
-                      <span className="light-pool absolute left-1/2 top-[50%] h-[50%] w-[140%] -translate-x-1/2 opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none" />
+      <ul className="mt-12 grid gap-5 md:grid-cols-3">
+        {entries.map(({ collection, products: lamps }, index) => (
+          <li key={collection.id} className="settle">
+            <Link
+              href={`/shop?collection=${collection.id}`}
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card/60 outline-none transition-[border-color,box-shadow] duration-500 hover:border-foreground/20 hover:shadow-[0_30px_60px_-45px_rgb(35_32_28/0.5)] focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
+            >
+              <span aria-hidden="true" className="relative block aspect-[11/5] overflow-hidden bg-secondary/60">
+                <span className="room-glow absolute inset-x-[-10%] top-[-10%] h-[110%] opacity-0 transition-opacity duration-700 group-hover:opacity-80 group-focus-visible:opacity-80 motion-reduce:transition-none" />
+                {/* The bay's own length of brushed track. */}
+                <span className="absolute inset-x-[8%] top-0 h-[5px] rounded-b-[3px] bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--muted-foreground)_40%,white),var(--muted-foreground))] shadow-[0_1px_2px_rgb(35_32_28/0.2)]" />
+                <span className="absolute inset-x-[8%] top-0 flex h-full justify-center gap-[2.5%]">
+                  {lamps.slice(0, 4).map((product, lamp) => (
+                    <span key={product.id} className="relative block h-full w-[23%]">
+                      <span
+                        className="light-pool absolute left-1/2 top-[52%] h-[48%] w-[150%] -translate-x-1/2 opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+                        style={{ transitionDelay: `${lamp * 90}ms` }}
+                      />
                       <LampImage product={product} lit="hover" className="inset-x-0 top-0 w-full" />
                     </span>
                   ))}
                 </span>
-                <span className="mt-6 font-display text-[1.65rem] leading-tight tracking-[-0.01em]">{collection.name}</span>
+              </span>
+              <span className="flex flex-1 flex-col px-6 pb-6 pt-5">
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-[1.65rem] leading-tight tracking-[-0.01em]">{collection.name}</span>
+                  <span className="font-mono text-[11px] text-muted-foreground">Bay {String(index + 1).padStart(2, "0")}</span>
+                </span>
                 <span className="mt-2 max-w-[34ch] text-sm leading-relaxed text-muted-foreground">{collection.description}</span>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium">
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium">
                   Shop {lamps.length} {lamps.length === 1 ? "pendant" : "pendants"}
                   <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
                 </span>
-              </Link>
-            </li>
-          );
-        })}
+              </span>
+            </Link>
+          </li>
+        ))}
       </ul>
     </section>
   );

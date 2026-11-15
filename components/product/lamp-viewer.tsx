@@ -1,54 +1,29 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "cn";
+import { productTitle } from "@/lib/catalog/helpers";
 import type { Product } from "@/lib/catalog/types";
-import { HangingLamp } from "./hanging-lamp";
-import { LampImage } from "./lamp-image";
+import { LightControls, LightStage, useLight, type Room } from "./light-stage";
 
-/* The product photo with a light switch: the paired lit and unlit photos cross-fade, and the pool of light follows. */
+const CAPTIONS: Record<Room, [string, string]> = {
+  day: ["Switched off, as it looks by day.", "Lit with the included LED lamp, in daylight."],
+  evening: ["Switched off, after dark.", "Lit with the included LED lamp, after dark."],
+};
+
+/* The product page's centrepiece: the lamp on its lighting stage, with a switch, a dimmer and a day or evening room. */
 export function LampViewer({ product }: { product: Product }) {
-  const [lit, setLit] = React.useState(true);
+  const { level, on, setLevel, toggle } = useLight(1);
+  const [room, setRoom] = React.useState<Room>("day");
   return (
-    <figure className="lg:sticky lg:top-24">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-[radial-gradient(70%_55%_at_50%_58%,color-mix(in_oklab,var(--card)_80%,transparent),transparent)] bg-secondary/70">
-        <span aria-hidden="true" className="ceiling-canopy absolute left-1/2 top-0 z-10 w-10 -translate-x-1/2" />
-        <span
-          aria-hidden="true"
-          className={cn(
-            "light-pool absolute left-1/2 top-[46%] h-[54%] w-full -translate-x-1/2 transition-opacity duration-700 motion-reduce:transition-none",
-            lit ? "opacity-100" : "opacity-0",
-          )}
-        />
-        <HangingLamp>
-          <LampImage product={product} lit={lit} eager className="left-[15%] top-0 w-[70%]" />
-        </HangingLamp>
+    <figure className="mx-auto w-full lg:sticky lg:top-24 lg:max-w-[min(100%,calc((100svh-13rem)*0.8))]">
+      <div className="overflow-hidden rounded-2xl shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_30px_60px_-40px_rgb(35_32_28/0.45)]">
+        <LightStage images={product.images} level={level} room={room} eager />
       </div>
-      <figcaption className="mt-4 flex items-center justify-between gap-4">
-        <span className="text-[13px] text-muted-foreground">{lit ? "Lit with the included LED lamp." : "Switched off, as it looks by day."}</span>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={lit}
-          onClick={() => setLit((value) => !value)}
-          className="group/switch inline-flex h-10 shrink-0 items-center gap-3 rounded-full pl-1 pr-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          Light
-          <span
-            aria-hidden="true"
-            className={cn(
-              "relative h-6 w-11 rounded-full border transition-colors duration-300 motion-reduce:transition-none",
-              lit ? "border-brass bg-brass" : "border-foreground/20 bg-secondary",
-            )}
-          >
-            <span
-              className={cn(
-                "absolute top-1/2 size-[18px] -translate-y-1/2 rounded-full bg-card shadow-[0_1px_3px_rgb(35_32_28/0.3)] transition-[left] duration-300 motion-reduce:transition-none",
-                lit ? "left-[calc(100%-21px)]" : "left-[2px]",
-              )}
-            />
-          </span>
-        </button>
+      <figcaption className="mt-5 grid gap-3">
+        <LightControls level={level} onLevel={setLevel} onToggle={toggle} room={room} onRoom={setRoom} label={productTitle(product)} />
+        <span className="text-[13px] text-muted-foreground" aria-live="polite">
+          {CAPTIONS[room][on ? 1 : 0]}
+        </span>
       </figcaption>
     </figure>
   );

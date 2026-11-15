@@ -13,7 +13,7 @@ export function StudioSection({ products, collectionCount }: { products: Product
   ];
   return (
     <section id="studio" aria-labelledby="studio-title" className="scroll-mt-16 border-t border-border bg-secondary/45">
-      <div className="shell grid gap-12 py-20 sm:py-28 lg:grid-cols-[1fr_1fr] lg:gap-24">
+      <div className="settle shell grid gap-12 py-20 sm:py-28 lg:grid-cols-[1fr_1fr] lg:gap-24">
         <div>
           <p className="eyebrow">The studio</p>
           <h2 id="studio-title" className="mt-3 max-w-[14ch] font-display text-[clamp(2.1rem,3.8vw,3.1rem)] font-light leading-[1.04] tracking-[-0.02em]">

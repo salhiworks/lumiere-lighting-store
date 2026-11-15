@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isPublishedSlug, MISSING_PRODUCT_PATH } from "@/lib/catalog/published-slugs";
 import { orderTokenExists } from "@/lib/checkout/status-link";
 import { demoProductIds } from "@/lib/demo-admin/catalog";
+import { isLocalProductId, LOCAL_SLUGS_COOKIE, parseLocalSlugs } from "@/lib/demo-admin/ids";
 import { demoOrders } from "@/lib/demo-admin/orders";
 import { PUBLIC_DEMO } from "@/lib/public-demo";
 import { getSupabaseConfig, SESSION_COOKIE_OPTIONS, type SupabaseConfig } from "@/lib/supabase/config";
@@ -29,15 +30,22 @@ export async function proxy(request: NextRequest) {
   return adminProxy(request, pathname);
 }
 
-/* The Demo Admin Dashboard: /demo/admin and the pages under it, which hold only built-in sample data and the visitor's own browser edits. */
+/*
+ * The Demo Admin Dashboard: /demo/admin and the pages under it, which hold only built-in sample data and the visitor's own browser
+ * edits. Products the visitor created exist only in their browser, so their edit pages are allowed by ID format (local-…); the page
+ * itself says when this browser has no such product.
+ */
 function isDemoDashboard(pathname: string) {
   const [, , , section, id, extra] = pathname.split("/");
   if (pathname === "/demo/admin" || pathname === "/demo/admin/") return true;
   if (extra !== undefined) return false;
   if (section === "orders") return id === undefined || id === "" || demoOrders.some((order) => order.id === id);
-  if (section === "products") return id !== undefined && demoProductIds.includes(id);
+  if (section === "products") return id === undefined || id === "" || id === "new" || demoProductIds.includes(id) || isLocalProductId(id);
   return false;
 }
+
+/* Internal only: proxy.ts rewrites to it; a direct request is a 404 (it isn't a dashboard page). */
+const LOCAL_PRODUCT_PATH = "/demo/local-product";
 
 /* The store's not-found page with a real 404 status, decided before anything renders. */
 function missing(request: NextRequest) {
@@ -56,7 +64,20 @@ async function checkoutProxy(request: NextRequest) {
 
 async function productProxy(request: NextRequest, slug: string) {
   if ((await isPublishedSlug(slug)) !== false) return NextResponse.next();
+  if (PUBLIC_DEMO && parseLocalSlugs(request.cookies.get(LOCAL_SLUGS_COOKIE)?.value).includes(slug)) return localDemoProduct(request);
   return missing(request);
+}
+
+/*
+ * Public demo only: a product the visitor created in the Demo Admin, which lives in their browser. Its slug is in the cookie that
+ * browser keeps (lib/demo-admin/ids.ts), so its address gets a real page with HTTP 200: the demo's local-product page, which draws
+ * the product from localStorage. Every other unknown slug is still a 404. Private and never indexed.
+ */
+function localDemoProduct(request: NextRequest) {
+  const response = NextResponse.rewrite(new URL(LOCAL_PRODUCT_PATH, request.url));
+  response.headers.set("Cache-Control", "private, no-store");
+  response.headers.set("X-Robots-Tag", "noindex");
+  return response;
 }
 
 async function adminProxy(request: NextRequest, pathname: string) {

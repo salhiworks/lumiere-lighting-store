@@ -2,7 +2,7 @@
 
 The admin lives at `/admin` once Supabase is connected (README, "Connect Supabase"). The public demo build has no admin at all.
 
-`/admin` signs in with Supabase Auth (email and password). It covers:
+`/admin` signs in with Supabase Auth (email and password) and opens on the **Overview**: catalog counts (products, published, collections, low stock), what needs attention (orders to ship or review, low stock, hidden products), the latest product changes and orders, and any pendant on the storefront's lighting stage. Every figure is counted from your own products and orders. It covers:
 - **Products:** every product with its photo, price, stock and visibility. Search by name, finish, collection or URL name, and show or hide a product in one click.
 - **Add and edit:**
   - name, finish, URL name and collection
@@ -10,6 +10,7 @@ The admin lives at `/admin` once Supabase is connected (README, "Connect Supabas
   - summary, description, highlights and specifications
   - photo description, cord length on the rail, and visibility (new products start hidden)
 - **Photo pairs:** upload or replace the unlit and lit photos together, and preview them as Off, On and Overlay before saving.
+- **Live preview:** while editing, the product sits on the storefront's own lighting stage (switch, dimmer, day or evening room), and as the shop card and rail pendant visitors will see, following the form as you type and new photos before they're saved.
 - **Orders:** every order with its payment status from Stripe, filters (To ship, Awaiting payment, Needs review, Shipped, Not completed) and search. An order page shows the purchased pendants at their checkout prices, the customer and shipping address, and a fulfillment form (status, carrier, tracking). Payment status can't be edited by hand.
 
 Every change goes through a Server Action. Each action checks administrator rights on the server, validates every field, and writes under the admin's own session, so Row Level Security has the final say. A save updates the rail, shop, collections, product pages and carts at once.

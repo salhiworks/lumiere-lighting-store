@@ -7,11 +7,12 @@ import { cn } from "cn";
 export type AdminNavLink = { href: string; label: string; active: (path: string) => boolean };
 
 const LINKS: AdminNavLink[] = [
-  { href: "/admin", label: "Products", active: (path: string) => path === "/admin" || path.startsWith("/admin/products") },
+  { href: "/admin", label: "Overview", active: (path: string) => path === "/admin" },
+  { href: "/admin/products", label: "Products", active: (path: string) => path.startsWith("/admin/products") },
   { href: "/admin/orders", label: "Orders", active: (path: string) => path.startsWith("/admin/orders") },
 ];
 
-/* The real admin's two links by default; the public Demo Admin Dashboard passes its own. */
+/* The real admin's sections by default; the public Demo Admin Dashboard passes its own. */
 export function AdminNav({ links = LINKS }: { links?: AdminNavLink[] }) {
   const pathname = usePathname();
   return (

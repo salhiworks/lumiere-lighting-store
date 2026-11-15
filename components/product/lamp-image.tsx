@@ -3,8 +3,8 @@ import type { ProductImages } from "@/lib/catalog/types";
 
 type LampImageProps = {
   product: { images: ProductImages };
-  /** Which photo shows: lit, unlit, or lit only while a parent `.group` is hovered or keyboard-focused. */
-  lit: boolean | "hover";
+  /** Which photo shows: lit, unlit, lit only while a parent `.group` is hovered or keyboard-focused, or a dimmer level from 0 to 1. */
+  lit: boolean | "hover" | number;
   /** Positions the photo box. The box keeps the pair's own proportions unless `fit` is "cover". */
   className?: string;
   /** "hang" anchors the lamp at the top of its box, cord first; "cover" crops onto the shade for thumbnails. */
@@ -39,9 +39,11 @@ export function LampImage({ product, lit, className, fit = "hang", eager = false
         draggable={false}
         className={cn(
           photo,
-          "transition-opacity duration-500 ease-out motion-reduce:transition-none",
-          lit === "hover" ? "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100" : lit ? "opacity-100" : "opacity-0",
+          "transition-opacity ease-out motion-reduce:transition-none",
+          typeof lit === "number" ? "duration-300" : "duration-500",
+          lit === "hover" ? "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100" : typeof lit === "number" ? undefined : lit ? "opacity-100" : "opacity-0",
         )}
+        style={typeof lit === "number" ? { opacity: Math.max(0, Math.min(1, lit)) } : undefined}
       />
     </span>
   );

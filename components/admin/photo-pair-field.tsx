@@ -16,7 +16,12 @@ const ACCEPT = "image/png,image/webp";
  * Picks the switched-off and switched-on photos, previews them exactly as the store will (same box, same fit), and checks the pair
  * in the browser before anything is uploaded. The checks here are advice; the server enforces the hard rules again on save.
  */
-export function PhotoPairField({ current, error }: { current?: ProductImages; error?: string }) {
+/** A complete pair picked in the field but not saved yet, as browser-local object URLs (for live previews elsewhere in the form). */
+export type PickedPair = { off: string; on: string; width: number; height: number };
+
+type PhotoPairFieldProps = { current?: ProductImages; error?: string; onPairChange?: (pair: PickedPair | null) => void };
+
+export function PhotoPairField({ current, error, onPairChange }: PhotoPairFieldProps) {
   const [off, setOff] = React.useState<Picked | null>(null);
   const [on, setOn] = React.useState<Picked | null>(null);
   const [view, setView] = React.useState<View>("on");
@@ -49,6 +54,14 @@ export function PhotoPairField({ current, error }: { current?: ProductImages; er
     };
   }, [off, on]);
   const checks = analysis && analysis.key === pairKey ? analysis.checks : null;
+
+  const pairChange = React.useRef(onPairChange);
+  React.useEffect(() => {
+    pairChange.current = onPairChange;
+  });
+  React.useEffect(() => {
+    pairChange.current?.(off && on && off.width === on.width && off.height === on.height ? { off: off.url, on: on.url, width: off.width, height: off.height } : null);
+  }, [off, on]);
 
   const choose = async (which: "off" | "on", file: File | undefined) => {
     setAnsweredError(error);

@@ -1,48 +1,44 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowUpRight, RotateCcw } from "lucide-react";
-import { AdminNav, type AdminNavLink } from "@/components/admin/admin-nav";
-import { Wordmark } from "@/components/layout/wordmark";
-import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { demoStore } from "@/lib/demo-admin/store";
+import { useDemoEdits } from "@/lib/demo-admin/use-demo-catalog";
 
-const LINKS: AdminNavLink[] = [
-  { href: "/demo/admin", label: "Products", active: (path) => path === "/demo/admin" || path.startsWith("/demo/admin/products") },
-  { href: "/demo/admin/orders", label: "Orders", active: (path) => path.startsWith("/demo/admin/orders") },
-];
-
-/* The Demo Admin Dashboard's header: the real admin's look and navigation, with Reset Demo where the real one has Sign out. */
-export function DemoAdminHeader() {
+/*
+ * The Demo Admin Dashboard's account corner: where the real admin has Sign out, the demo has Reset Demo. It forgets every edit and
+ * every product the visitor created, in this browser; the cart is the visitor's own and stays.
+ */
+export function DemoResetControl() {
+  const edits = useDemoEdits();
   const [message, setMessage] = React.useState("");
+  const changes = Object.keys(edits.products).length + Object.keys(edits.orders).length + Object.keys(edits.created).length;
+  React.useEffect(() => {
+    if (!message) return;
+    const timer = window.setTimeout(() => setMessage(""), 4000);
+    return () => window.clearTimeout(timer);
+  }, [message]);
   const reset = () => {
+    const created = Object.keys(edits.created).length;
+    if (created > 0 && !window.confirm(`Reset the demo? This deletes the ${created === 1 ? "product" : `${created} products`} you created and undoes every edit, in this browser.`)) return;
     demoStore.reset();
     setMessage("Demo reset. The sample pendants and orders are back as they were.");
   };
   return (
-    <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
-      <div className="shell flex min-h-16 flex-wrap items-center gap-x-3 gap-y-1 py-2">
-        <Link href="/demo/admin" className="flex items-baseline gap-3 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <Wordmark className="text-[1.15rem]" />
-          <span className="eyebrow">Demo admin</span>
-        </Link>
-        <div className="ml-2 mr-auto sm:ml-4">
-          <AdminNav links={LINKS} />
-        </div>
-        <Link
-          href="/"
-          className="hidden h-9 items-center gap-1 rounded-full px-3 text-[13px] font-medium text-foreground/75 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+    <div className="grid gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[12.5px] text-night-muted">{changes ? `${changes} ${changes === 1 ? "change" : "changes"} in this browser` : "Sample data, unchanged"}</span>
+        <button
+          type="button"
+          onClick={reset}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-night-line px-3 text-[12.5px] font-medium text-night-foreground outline-none transition-colors hover:border-night-muted focus-visible:ring-2 focus-visible:ring-ember motion-reduce:transition-none"
         >
-          View store <ArrowUpRight className="size-3.5" aria-hidden="true" />
-        </Link>
-        <Button type="button" variant="outline" size="sm" onClick={reset}>
-          <RotateCcw aria-hidden="true" /> Reset Demo
-        </Button>
+          <RotateCcw className="size-3.5" aria-hidden="true" /> Reset Demo
+        </button>
       </div>
-      <p role="status" aria-live="polite" className={message ? "border-t border-border/60 bg-secondary/60 py-1.5 text-center text-[12.5px]" : "sr-only"}>
+      <p role="status" aria-live="polite" className={message ? "text-[12px] text-ember" : "sr-only"}>
         {message}
       </p>
-    </header>
+    </div>
   );
 }

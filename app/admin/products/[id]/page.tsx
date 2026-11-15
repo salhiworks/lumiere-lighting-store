@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminFrame } from "@/components/admin/admin-frame";
 import { ProductForm } from "@/components/admin/product-form";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getAdminProduct, listAdminCollections } from "@/lib/admin/catalog";
@@ -16,11 +16,9 @@ export default async function EditProductPage({ params, searchParams }: PageProp
   if (!product) notFound();
 
   return (
-    <>
-      <AdminHeader email={session.email} />
-      <main id="main" tabIndex={-1} className="flex-1 outline-none">
-        <div className="shell pt-8">
-          <Link href="/admin" className="inline-flex items-center gap-1.5 rounded-sm text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+    <AdminFrame email={session.email}>
+        <div className="pt-8">
+          <Link href="/admin/products" className="inline-flex items-center gap-1.5 rounded-sm text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
             <ArrowLeft className="size-3.5" aria-hidden="true" /> All products
           </Link>
           <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
@@ -31,7 +29,6 @@ export default async function EditProductPage({ params, searchParams }: PageProp
           </div>
           <ProductForm product={product} collections={collections} created={created === "1"} />
         </div>
-      </main>
-    </>
+    </AdminFrame>
   );
 }

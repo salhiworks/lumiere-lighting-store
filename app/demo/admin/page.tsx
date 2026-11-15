@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { DemoProducts } from "@/components/demo-admin/demo-products";
+import { DemoOverview } from "@/components/demo-admin/demo-overview";
 
-export const metadata: Metadata = { title: "Products" };
+export const metadata: Metadata = { title: "Overview" };
 
-export default function DemoAdminProductsPage() {
-  return <DemoProducts />;
+export default function DemoAdminOverviewPage() {
+  return <DemoOverview />;
 }

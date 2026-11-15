@@ -3,7 +3,7 @@
 | What | Where it's used | Source | License |
 | --- | --- | --- | --- |
 | Pendant Lamp Rail, by dhxwhy | `components/ui/pendant-lamp-rail.tsx` (original in `reference/21st-dev/`) | https://21st.dev/@dhxwhy/components/pendant-lamp-rail | Labelled MIT on the source page; the published source carries no copyright line or license text. Credit: dhxwhy on 21st.dev. |
-| Lamp photos (16) | Served at `/lamps/…` | 21st.dev demo CDN | **Unverified.** Not covered by the component's MIT label. See `docs/ASSETS.md`. |
+| Lamp photos (16), and the screenshots in `docs/images/` that show them | Served at `/lamps/…`; the screenshots are in this repository | 21st.dev demo CDN | **Not licensed for reuse.** Not covered by the component's MIT label; 21st.dev's Terms of Service reserve demo media. See `docs/ASSETS.md`. |
 | shadcn/ui Button and Sheet | `components/ui/button.tsx`, `components/ui/sheet.tsx` | https://ui.shadcn.com | MIT |
 | `cn` (class merging) | throughout | https://github.com/shadcn-ui/cn | MIT |
 | Radix UI (Dialog, Slot) | via `radix-ui` | https://www.radix-ui.com | MIT |

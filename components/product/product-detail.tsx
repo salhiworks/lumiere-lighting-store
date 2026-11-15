@@ -40,32 +40,36 @@ export function ProductDetail({ product, collection, related }: { product: Produ
         </nav>
       </div>
 
-      <article className="shell grid gap-10 pb-20 pt-6 sm:pt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16 xl:gap-24">
+      <article className="shell grid gap-10 pb-20 pt-6 sm:pt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 xl:gap-24">
         <LampViewer product={product} />
 
-        <div className="lg:pt-4">
-          <p className="eyebrow">{collection.name}</p>
-          <h1 className="mt-3 font-display text-[clamp(2.6rem,4.8vw,4rem)] font-light leading-[0.98] tracking-[-0.03em]">{product.name}</h1>
-          <p className="mt-2 font-display text-xl text-muted-foreground">{product.finish}</p>
+        <div className="lg:pt-2">
+          <p className="eyebrow">
+            {collection.name} <span aria-hidden="true">·</span> Ø {product.diameterCm} cm
+          </p>
+          <h1 className="mt-4 font-display text-[clamp(2.8rem,5.2vw,4.4rem)] font-light leading-[0.95] tracking-[-0.035em]">{product.name}</h1>
+          <p className="mt-2 font-display text-[1.45rem] italic text-muted-foreground">{product.finish}</p>
 
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
-            <p className="text-2xl tabular-nums">{formatPrice(product.priceCents, product.currency)}</p>
-            <StockBadge product={product} />
+          <p className="mt-6 max-w-[46ch] text-[17px] leading-[1.6] text-foreground/90">{product.summary}</p>
+
+          <div className="mt-8 flex flex-wrap items-end gap-x-6 gap-y-2 border-t border-foreground/15 pt-6">
+            <p className="font-display text-[2.4rem] font-light leading-none tabular-nums tracking-[-0.02em]">{formatPrice(product.priceCents, product.currency)}</p>
+            <StockBadge product={product} className="pb-1" />
           </div>
 
-          <p className="mt-6 max-w-[54ch] text-[16px] leading-[1.7] text-foreground/85">{product.description}</p>
-
-          <div className="mt-8">
+          <div className="mt-6">
             <AddToCart product={product} />
           </div>
 
-          <ul aria-label="Highlights" className="mt-6 flex flex-wrap gap-2">
+          <ul aria-label="Highlights" className="mt-4 flex flex-wrap gap-2">
             {product.highlights.map((highlight) => (
-              <li key={highlight} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+              <li key={highlight} className="rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
                 {highlight}
               </li>
             ))}
           </ul>
+
+          <p className="mt-10 max-w-[56ch] text-[15.5px] leading-[1.75] text-foreground/80">{product.description}</p>
 
           <section aria-labelledby="specs-title" className="mt-10">
             <h2 id="specs-title" className="eyebrow">
@@ -91,12 +95,15 @@ export function ProductDetail({ product, collection, related }: { product: Produ
         </div>
       </article>
 
-      <section aria-labelledby="related-title" className="border-t border-border bg-secondary/40 py-20">
+      <section aria-labelledby="related-title" className="border-t border-border bg-secondary/40 py-20 sm:py-24">
         <div className="shell">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 id="related-title" className="font-display text-[clamp(1.8rem,3vw,2.4rem)] font-light tracking-[-0.02em]">
-              More pendants
-            </h2>
+            <div>
+              <p className="eyebrow">Elsewhere in the showroom</p>
+              <h2 id="related-title" className="mt-3 font-display text-[clamp(1.8rem,3vw,2.4rem)] font-light tracking-[-0.02em]">
+                More pendants
+              </h2>
+            </div>
             <Link href="/shop" className="rounded-sm text-sm font-medium underline decoration-foreground/25 underline-offset-[6px] outline-none hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring">
               View all pendants
             </Link>
