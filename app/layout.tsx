@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
 import "./globals.css";
 
 /* Display serif for names and headlines, a Scandinavian-leaning grotesk for the interface, a mono for spec-sheet data. */
-const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader", axes: ["opsz"], display: "swap" });
+const newsreader = Newsreader({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-newsreader", axes: ["opsz"], display: "swap" });
 const albertSans = Albert_Sans({ subsets: ["latin"], variable: "--font-albert-sans", display: "swap" });
 const dmMono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dm-mono", display: "swap" });
 
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-svh flex-col">
         <a
           href="#main"
-          className="sr-only rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50"
+          className="sr-only rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-background"
         >
           Skip to content
         </a>

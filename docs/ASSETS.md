@@ -2,9 +2,9 @@
 
 ## Status
 
-**Rights unverified. Replace these photos with ones you own or have licensed before selling real products.**
+**No reuse license. Replace these photos with ones you own or have licensed before any public release.**
 
-The 16 photos (8 pairs) are the ones the 21st.dev *Pendant Lamp Rail* demo loads from `cdn.21st.dev/assets/mirror/…`. The 21st.dev page labels the component as MIT, but that label covers the code only. Nothing states who made the photos or under what terms they may be reused. This repository does not contain them: the store loads them from the 21st.dev demo CDN through its own address, and the demo shows them only to present the component.
+The 16 photos (8 pairs) are the ones the 21st.dev *Pendant Lamp Rail* demo loads from `cdn.21st.dev/assets/mirror/…`. The 21st.dev page labels the component as MIT, but that label covers the code only. Nothing states who made the photos or under what terms they may be reused, and 21st.dev's Terms of Service (https://21st.dev/terms, read 2026-11-15) say that demos, previews and their associated media belong to 21st Labs Inc., that no right is granted to them, and that republishing or reusing media assets such as images needs authorization. Treat the photos as unlicensed until 21st Labs Inc. (or whoever holds the rights) grants permission in writing. This repository does not contain them: the store loads them from the 21st.dev demo CDN through its own address, and the demo shows them only to present the component.
 
 ## How the photos are served
 

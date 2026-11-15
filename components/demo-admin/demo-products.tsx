@@ -1,12 +1,13 @@
 "use client";
 
 import { ProductList } from "@/components/admin/product-list";
-import { DemoBanner } from "./demo-banner";
+import { ProductsHeader } from "@/components/admin/products-header";
 import { demoAdminCollections, demoAdminProducts } from "@/lib/demo-admin/catalog";
 import { demoStore } from "@/lib/demo-admin/store";
 import { useDemoEdits } from "@/lib/demo-admin/use-demo-catalog";
+import { DemoBanner } from "./demo-banner";
 
-/* Products: the real admin's list, over the sample pendants and this browser's edits. Hide or publish works at once, and the store follows. */
+/* Products: the real admin's list, over the sample pendants, this browser's edits and the visitor's own products. Hide or publish works at once, and the store follows. */
 export function DemoProducts() {
   const edits = useDemoEdits();
   const products = demoAdminProducts(edits);
@@ -14,14 +15,7 @@ export function DemoProducts() {
   const low = products.filter((product) => product.published && product.stock <= 5).length;
   return (
     <>
-      <div className="pt-10">
-        <p className="eyebrow">Catalog</p>
-        <h1 className="mt-2 font-display text-[clamp(2.2rem,4vw,3rem)] font-light leading-none tracking-[-0.02em]">Products</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {products.length - hidden} visible in the store · {hidden} hidden{low > 0 && ` · ${low} low on stock or sold out`}
-        </p>
-      </div>
-      <DemoBanner />
+      <ProductsHeader visible={products.length - hidden} hidden={hidden} low={low} newHref="/demo/admin/products/new" note={<DemoBanner />} />
       <ProductList
         products={products}
         collections={demoAdminCollections}

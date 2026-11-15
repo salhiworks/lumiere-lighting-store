@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminFrame } from "@/components/admin/admin-frame";
 import { OrderTable } from "@/components/admin/order-table";
 import { requireAdmin } from "@/lib/admin/auth";
 import { listAdminOrders } from "@/lib/admin/orders";
@@ -23,10 +23,8 @@ export default async function AdminOrdersPage() {
   const review = orders.filter((order) => order.payment_status === "needs_review").length;
 
   return (
-    <>
-      <AdminHeader email={session.email} />
-      <main id="main" tabIndex={-1} className="flex-1 pb-24 outline-none">
-        <div className="shell">
+    <AdminFrame email={session.email}>
+        <div className="pt-2">
           <div className="pt-10">
             <p className="eyebrow">Sales</p>
             <h1 className="mt-2 font-display text-[clamp(2.2rem,4vw,3rem)] font-light leading-none tracking-[-0.02em]">Orders</h1>
@@ -56,7 +54,6 @@ export default async function AdminOrdersPage() {
 
           <OrderTable orders={orders} />
         </div>
-      </main>
-    </>
+    </AdminFrame>
   );
 }

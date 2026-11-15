@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminFrame } from "@/components/admin/admin-frame";
 import { FulfillmentForm, RecheckPayment } from "@/components/admin/fulfillment-form";
 import { FormSection } from "@/components/admin/form-controls";
 import { PaymentBadge } from "@/components/admin/order-badges";
@@ -35,10 +35,8 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
   const open = order.payment_status === "pending" || order.payment_status === "processing";
 
   return (
-    <>
-      <AdminHeader email={session.email} />
-      <main id="main" tabIndex={-1} className="flex-1 pb-24 outline-none">
-        <div className="shell">
+    <AdminFrame email={session.email}>
+        <div className="pt-2">
           <Link href="/admin/orders" className="mt-8 inline-flex items-center gap-1.5 rounded-sm text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
             <ArrowLeft className="size-3.5" aria-hidden="true" /> All orders
           </Link>
@@ -158,7 +156,6 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
             </div>
           </div>
         </div>
-      </main>
-    </>
+    </AdminFrame>
   );
 }

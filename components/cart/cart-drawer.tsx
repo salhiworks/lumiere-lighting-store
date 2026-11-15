@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { LampImage } from "@/components/product/lamp-image";
+import { ProductLink } from "@/components/product/product-link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { productTitle } from "@/lib/catalog/helpers";
@@ -100,18 +101,17 @@ type CartLineItemProps = {
 
 function CartLineItem({ item, onNavigate, onQuantity, onRemove }: CartLineItemProps) {
   const { product, quantity, max, lineTotalCents } = item;
-  const href = `/shop/${product.slug}`;
   return (
     <li className="flex gap-4 border-b border-border py-5 last:border-b-0">
-      <Link href={href} onClick={onNavigate} tabIndex={-1} aria-hidden="true" className="relative h-28 w-20 shrink-0 overflow-hidden rounded-md bg-secondary">
+      <ProductLink product={product} onClick={onNavigate} tabIndex={-1} aria-hidden="true" className="relative h-28 w-20 shrink-0 overflow-hidden rounded-md bg-secondary">
         <LampImage product={product} lit fit="cover" className="inset-0" />
-      </Link>
+      </ProductLink>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <Link href={href} onClick={onNavigate} className="font-display text-lg leading-tight underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-ring">
+            <ProductLink product={product} onClick={onNavigate} className="font-display text-lg leading-tight underline-offset-4 outline-none hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-ring">
               {product.name}
-            </Link>
+            </ProductLink>
             <p className="mt-0.5 text-[13px] text-muted-foreground">
               {product.finish} · {formatPrice(product.priceCents, product.currency)} each
             </p>

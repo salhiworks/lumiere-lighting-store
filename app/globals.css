@@ -46,6 +46,12 @@
   --color-chart-5: var(--chart-5);
   --color-brass: var(--brass);
   --color-brass-deep: var(--brass-deep);
+  --color-night: var(--night);
+  --color-night-raised: var(--night-raised);
+  --color-night-line: var(--night-line);
+  --color-night-foreground: var(--night-foreground);
+  --color-night-muted: var(--night-muted);
+  --color-ember: var(--ember);
 
   --font-sans: var(--font-albert-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
@@ -94,6 +100,15 @@
   --chart-5: oklch(0.645 0.246 16.439);
   /* The rail's light-palette glow, shared by product cards and the product page. */
   --glow: color-mix(in oklab, var(--chart-4) 68%, white);
+
+  /* The evening counterpart to Porcelain: a warm graphite room where the lit photos glow. Used for the homepage's after-dark scene,
+     the product page's Evening room and the admin's studio sidebar. Night-muted is 6.4:1 and ember 9:1 on Night. */
+  --night: oklch(0.205 0.011 68); /* Night #1B1815 */
+  --night-raised: oklch(0.25 0.012 70); /* #26221E */
+  --night-line: oklch(0.33 0.013 72); /* #3A3530 */
+  --night-foreground: oklch(0.94 0.011 84); /* #EEE9E1 */
+  --night-muted: oklch(0.73 0.016 80); /* #ABA397 */
+  --ember: oklch(0.83 0.1 80); /* lamp-light accent on Night */
 
   --radius: 0.5rem;
 }
@@ -158,7 +173,126 @@
   );
 }
 
-/* Brand type inside the rail's detail view, styled through its public data-slot hook rather than by editing the component. */
+/* Day turning to evening between the porcelain showroom and the night stage: it starts exactly on the hero's floor colour, warms
+   through the lamps' own glow (an amber dusk, never grey), then falls to Night along an eased curve. */
+@utility dusk {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--secondary) 55%, var(--background)) 0%,
+    color-mix(in oklab, var(--glow) 10%, color-mix(in oklab, var(--night) 5%, color-mix(in oklab, var(--secondary) 55%, var(--background)))) 18%,
+    color-mix(in oklab, var(--glow) 22%, color-mix(in oklab, var(--night) 30%, var(--background))) 40%,
+    color-mix(in oklab, var(--glow) 16%, color-mix(in oklab, var(--night) 62%, var(--background))) 62%,
+    color-mix(in oklab, var(--glow) 7%, color-mix(in oklab, var(--night) 86%, var(--background))) 82%,
+    var(--night) 100%
+  );
+}
+
+/* Warm light washing a whole surface: the room glow of a lit stage. */
+@utility room-glow {
+  background: radial-gradient(
+    60% 52% at 50% 46%,
+    color-mix(in oklab, var(--glow) 62%, transparent),
+    color-mix(in oklab, var(--glow) 18%, transparent) 55%,
+    transparent 80%
+  );
+}
+
+/* The dimmer: a slim brushed track that fills with brass up to the thumb (--fill is set inline, 0–100%). */
+@utility dimmer {
+  appearance: none;
+  height: 1.75rem;
+  background: transparent;
+  cursor: pointer;
+  --track: color-mix(in oklab, currentColor 18%, transparent);
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--brass) var(--fill, 100%), var(--track) var(--fill, 100%));
+  }
+  &::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--brass) var(--fill, 100%), var(--track) var(--fill, 100%));
+  }
+  &::-webkit-slider-thumb {
+    appearance: none;
+    margin-top: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid color-mix(in oklab, var(--foreground) 20%, transparent);
+    box-shadow: 0 1px 3px rgb(35 32 28 / 0.3), 0 0 0 calc(var(--fill-n, 1) * 6px) color-mix(in oklab, var(--glow) 35%, transparent);
+  }
+  &::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid color-mix(in oklab, var(--foreground) 20%, transparent);
+    box-shadow: 0 1px 3px rgb(35 32 28 / 0.3);
+  }
+  &:focus-visible {
+    outline: none;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  &:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+}
+
+/* The phone hero's swipe cue: an arrow that drifts right and back, like a finger moving the carousel along. */
+@keyframes swipe-hint {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(5px);
+  }
+}
+
+/* Sections settle into place as they scroll into view, in browsers with scroll-driven animations. No JavaScript, no layout cost;
+   without support (or with reduced motion) content is simply there. */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .settle {
+      animation: settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+/* Brand type inside the rail's detail view, styled through its public data-slot hook rather than by editing the component.
+   On large screens the detail grows with the screen (wider grid, taller lamp, larger type); the lift animation measures the figure's
+   real size, so its motion is unchanged. */
+@media (min-width: 1280px) {
+  [data-slot="pendant-lamp-detail"] > .grid {
+    max-width: 70rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
+    column-gap: 5.5rem;
+  }
+  [data-slot="pendant-lamp-detail"] [data-figure] {
+    height: min(66vh, 600px);
+  }
+  [data-slot="pendant-lamp-detail"] h3 {
+    font-size: 2.4rem;
+    line-height: 1.05;
+  }
+  [data-slot="pendant-lamp-detail"] h3 + p {
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+}
 [data-slot="pendant-lamp-detail"] h3 {
   font-family: var(--font-newsreader), ui-serif, Georgia, serif;
   font-weight: 400;

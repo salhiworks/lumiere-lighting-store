@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/admin/slugify";
 import type { AdminProduct, Collection } from "@/lib/catalog/types";
 import { controlClass, Field, FormSection } from "./form-controls";
-import { imageSize, PhotoPairField } from "./photo-pair-field";
+import { imageSize, PhotoPairField, type PickedPair } from "./photo-pair-field";
+import { ProductPreview, readDraft, type PreviewDraft } from "./product-preview";
 
 type SpecRow = { key: number; label: string; value: string };
 
@@ -88,6 +89,22 @@ function ProductFormBody({ product, collections, created = false }: ProductFormP
   const slugValue = slugEdited ? slug : slugify(name, finish);
   const input = (extra?: string) => cn(controlClass, "h-11", extra);
 
+  /* The live preview follows the form as it is typed and the photos as they are picked, before anything is saved. */
+  const formRef = React.useRef<HTMLFormElement>(null);
+  const [draft, setDraft] = React.useState<PreviewDraft>(() => ({
+    name: product?.name ?? "",
+    finish: product?.finish ?? "",
+    priceCents: product?.priceCents ?? null,
+    stock: product?.stock ?? 0,
+    published: product?.published ?? false,
+    drop: product?.drop ?? 0.75,
+  }));
+  const [pair, setPair] = React.useState<PickedPair | null>(null);
+  const refreshDraft = () => {
+    if (formRef.current) setDraft(readDraft(formRef.current, collections));
+  };
+  const previewImages = pair ? { ...pair, alt: product?.images.alt ?? "" } : (product?.images ?? null);
+
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy) return;
@@ -119,7 +136,7 @@ function ProductFormBody({ product, collections, created = false }: ProductFormP
   };
 
   return (
-    <form onSubmit={submit} onChange={() => setEditedAfter(result)} noValidate className="mt-8">
+    <form ref={formRef} onSubmit={submit} onChange={() => setEditedAfter(result)} onInput={refreshDraft} noValidate className="mt-8">
       {product && <input type="hidden" name="productId" value={product.id} />}
 
       {created && state.status === "idle" && (
@@ -179,6 +196,28 @@ function ProductFormBody({ product, collections, created = false }: ProductFormP
             </Field>
             <Field id="description" label="Description" hint="The product page copy." error={errors.description}>
               {(control) => <textarea {...control} name="description" defaultValue={product?.description} maxLength={2000} rows={5} className={cn(controlClass, "py-2.5 leading-relaxed")} />}
+            </Field>
+          </FormSection>
+
+          <FormSection title="Photos" description="The switched-off and switched-on cut-outs, always replaced as a pair.">
+            <PhotoPairField key={state.savedAt ?? "initial"} current={product?.images} error={errors.photos} onPairChange={setPair} />
+            <Field id="alt" label="Photo description" hint="Describes the lamp for screen readers, e.g. Dome pendant in forest-green enamel." error={errors.alt}>
+              {(control) => <input {...control} name="alt" defaultValue={product?.images.alt} maxLength={200} className={input()} />}
+            </Field>
+            <Field id="drop" label={`Cord length on the rail: ${drop.toFixed(2)}`} hint="How low the lamp hangs on the homepage rail. Longer cords swing more slowly." error={errors.drop}>
+              {(control) => (
+                <input
+                  {...control}
+                  name="drop"
+                  type="range"
+                  min={0.5}
+                  max={1.1}
+                  step={0.01}
+                  value={drop}
+                  onChange={(event) => setDrop(Number(event.currentTarget.value))}
+                  className="h-6 w-full cursor-pointer [accent-color:var(--brass)]"
+                />
+              )}
             </Field>
           </FormSection>
 
@@ -254,32 +293,12 @@ function ProductFormBody({ product, collections, created = false }: ProductFormP
           </FormSection>
         </div>
 
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <FormSection title="Photos" description="The switched-off and switched-on cut-outs, always replaced as a pair.">
-            <PhotoPairField key={state.savedAt ?? "initial"} current={product?.images} error={errors.photos} />
-            <Field id="alt" label="Photo description" hint="Describes the lamp for screen readers, e.g. Dome pendant in forest-green enamel." error={errors.alt}>
-              {(control) => <input {...control} name="alt" defaultValue={product?.images.alt} maxLength={200} className={input()} />}
-            </Field>
-            <Field id="drop" label={`Cord length on the rail: ${drop.toFixed(2)}`} hint="How low the lamp hangs on the homepage rail. Longer cords swing more slowly." error={errors.drop}>
-              {(control) => (
-                <input
-                  {...control}
-                  name="drop"
-                  type="range"
-                  min={0.5}
-                  max={1.1}
-                  step={0.01}
-                  value={drop}
-                  onChange={(event) => setDrop(Number(event.currentTarget.value))}
-                  className="h-6 w-full cursor-pointer [accent-color:var(--brass)]"
-                />
-              )}
-            </Field>
-          </FormSection>
+        <div className="lg:sticky lg:top-6 lg:self-start">
+          <ProductPreview images={previewImages} draft={draft} unsavedPhotos={Boolean(pair)} />
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-20 -mx-[clamp(1.25rem,4vw,2.5rem)] mt-12 border-t border-border bg-background/92 px-[clamp(1.25rem,4vw,2.5rem)] py-4 backdrop-blur-md">
+      <div className="sticky bottom-0 z-20 -mx-[clamp(1.25rem,4vw,3rem)] mt-12 border-t border-border bg-background/92 px-[clamp(1.25rem,4vw,3rem)] py-4 backdrop-blur-md">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <p
             role="status"
@@ -303,7 +322,7 @@ function ProductFormBody({ product, collections, created = false }: ProductFormP
             </Link>
           )}
           <Button asChild variant="outline">
-            <Link href="/admin">{product ? "Back to products" : "Cancel"}</Link>
+            <Link href="/admin/products">{product ? "Back to products" : "Cancel"}</Link>
           </Button>
           <Button type="submit" disabled={busy} className="min-w-36">
             {uploading ? "Uploading…" : pending ? "Saving…" : product ? "Save changes" : "Create product"}

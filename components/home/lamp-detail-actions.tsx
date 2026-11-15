@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { useCartCatalog } from "@/components/cart/cart-provider";
 import { useCart } from "@/components/cart/use-cart";
+import { ProductLink } from "@/components/product/product-link";
 import { Button } from "@/components/ui/button";
 import { getStockStatus, maxQuantity } from "@/lib/catalog/helpers";
 
@@ -56,13 +56,13 @@ export function LampDetailActions({ productId, onViewCart }: LampDetailActionsPr
             "Add to cart"
           )}
         </Button>
-        <Link
-          href={`/shop/${product.slug}`}
+        <ProductLink
+          product={product}
           className="group/link inline-flex items-center gap-1.5 rounded-sm text-sm font-medium underline decoration-foreground/25 underline-offset-[6px] outline-none transition-colors hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           View details
           <ArrowRight className="size-3.5 transition-transform group-hover/link:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
-        </Link>
+        </ProductLink>
       </div>
       <div className="flex min-h-5 items-center gap-3 text-xs">
         <p aria-live="polite" className="text-muted-foreground">
