@@ -2,7 +2,7 @@
 //   npm run build:demo   then   npm run start:demo   (extra arguments go to Next.js, e.g. npm run start:demo -- -p 4000)
 //
 // Every Supabase, Stripe and checkout setting is set to empty for Next.js, so values from .env.local (or the host) can't reach the
-// build; LUMIERE_PUBLIC_DEMO is then fixed into the build by next.config.ts. Plain Node, so it works the same on every OS.
+// build; LUMIERE_PUBLIC_DEMO is then fixed into the build by next.config.mjs. Plain Node, so it works the same on every OS.
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
 
@@ -30,6 +30,9 @@ const BLANKED = [
 const env = { ...process.env, LUMIERE_PUBLIC_DEMO: "true" };
 for (const name of BLANKED) env[name] = ""; // defined but empty: Next.js then never loads it from an .env file
 
+// The demo builds with webpack, like `npm run build`: Hostinger's build servers can't load Next.js's native SWC binary (GLIBC_2.29),
+// and only webpack can fall back to SWC's WebAssembly build.
+const args = command === "build" ? ["build", "--webpack", ...rest] : [command, ...rest];
 const next = createRequire(import.meta.url).resolve("next/dist/bin/next");
-const child = spawn(process.execPath, [next, command, ...rest], { env, stdio: "inherit" });
+const child = spawn(process.execPath, [next, ...args], { env, stdio: "inherit" });
 child.on("exit", (code, signal) => (signal ? process.kill(process.pid, signal) : process.exit(code ?? 1)));

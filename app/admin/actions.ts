@@ -18,7 +18,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 
 const BUCKET = "lamp-photos";
-/** Uploaded photos are served from this site under this prefix; next.config.ts proxies it to the lamp-photos bucket. */
+/** Uploaded photos are served from this site under this prefix; next.config.mjs proxies it to the lamp-photos bucket. */
 const UPLOAD_PREFIX = "/lamps/uploads/";
 const ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 /** How much of a stored photo is read to check it: format, size and transparency all sit in the first bytes. */

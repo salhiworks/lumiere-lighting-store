@@ -15,7 +15,7 @@ Products only ever point at paths on the store's own address. The original pairs
 /lamps/<product-id>-on.webp
 ```
 
-`next.config.ts` proxies these paths to the original CDN URLs listed in `lib/catalog/photo-sources.ts`. They are "afterFiles" rewrites, so a real file in `public/lamps/` with the same name is always served instead. That means:
+`next.config.mjs` proxies these paths to the original CDN URLs listed in `lib/catalog/photo-sources.mjs`. They are "afterFiles" rewrites, so a real file in `public/lamps/` with the same name is always served instead. That means:
 
 - The browser never hotlinks the CDN. Every photo is same-origin, which the rail needs for its CSS-mask drop shadows. Hotlinked, the masks fail at random because the CDN omits `Vary: Origin`.
 - Replacing a photo needs no code change: add the file under `public/lamps/` and it takes over.
@@ -24,7 +24,7 @@ Products only ever point at paths on the store's own address. The original pairs
 ## Photos uploaded in the admin
 
 The admin stores a new pair in the Supabase bucket `lamp-photos`, as `products/<product-id>/off-<stamp>.<ext>` and `on-<stamp>.<ext>`. The browser uploads the files straight to Storage through single-use signed URLs, so they never pass through the store's server.
-- The product then points at `/lamps/uploads/products/<product-id>/…`. `next.config.ts` proxies that path to the bucket, so uploaded photos are same-origin too.
+- The product then points at `/lamps/uploads/products/<product-id>/…`. `next.config.mjs` proxies that path to the bucket, so uploaded photos are same-origin too.
 - Every upload gets a new name, so browsers never show a cached old photo.
 - The files a save replaces are deleted afterwards, and so are uploads in that folder that were never saved and are more than an hour old.
 - Uploading never modifies or deletes the original pairs above. It only repoints the product; the original files stay where they are.
@@ -85,7 +85,7 @@ The rail's switch-on illusion only works when the lit photo lands on exactly the
    - **With Supabase:** upload each pair on the product's page in the admin. The checks above run before anything is stored.
    - **Without Supabase, or to ship them with the code:** export with the names above into `public/lamps/` (for example `public/lamps/dome-enamel-off.webp`). Public files win over the proxy immediately.
 3. Check each pair: open the product page, toggle the light switch, and confirm nothing but the light moves. Then hover the lamp on the homepage rail and check its cord joins the track cleanly.
-4. When no product uses the CDN photos any more, delete `lib/catalog/photo-sources.ts` and the demo-photo part of `rewrites()` in `next.config.ts`, and change the "Status" above.
+4. When no product uses the CDN photos any more, delete `lib/catalog/photo-sources.mjs` and the demo-photo part of `rewrites()` in `next.config.mjs`, and change the "Status" above.
 
 Browsers cache the proxied photos as `immutable` for a year, because they keep the CDN's headers. If anyone has loaded the prototype, give files in `public/lamps/` new names (for example `-off-v2.webp`). Then update the product's photos: `images` in `lib/catalog/demo-data.ts`, or the `image_off` and `image_on` columns in Supabase. Admin uploads always get new names, so they need none of this.
 

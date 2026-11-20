@@ -36,7 +36,7 @@ lib/
   checkout/                  checkout settings and the ordering flow (start, apply provider reports, reconcile)
   payments/                  the payment-provider interface and its Stripe implementation
   cart.ts                    cart store: localStorage, cross-tab sync, validation
-  public-demo.ts             the public demo flag, fixed into the build by next.config.ts
+  public-demo.ts             the public demo flag, fixed into the build by next.config.mjs
 proxy.ts                     real 404s for unknown product and order-status URLs; admin session refresh; non-admins redirected to sign in; everything but the store is a 404 in the public demo
 supabase/                    migrations (catalog and admin; orders and checkout) and seed
 reference/21st-dev/          untouched originals + integration patch (not compiled)

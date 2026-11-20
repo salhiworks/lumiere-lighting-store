@@ -6,7 +6,7 @@ import type { Collection, Product } from "./types";
  * supabase/seed.sql loads exactly the same products into the database.
  *
  * IDs, drops, summaries, highlight chips and image pairs are the demo's own; prices come from its tags ("$180" → 18000 cents).
- * Product copy and specs beyond the demo are illustrative. Photos are served from /lamps/ (see photo-sources.ts); their rights are
+ * Product copy and specs beyond the demo are illustrative. Photos are served from /lamps/ (see photo-sources.mjs); their rights are
  * unverified: see docs/ASSETS.md.
  */
 
